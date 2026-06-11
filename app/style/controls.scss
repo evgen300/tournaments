@@ -1,0 +1,36 @@
+.button {
+  border-radius: 8px;
+  padding: 3px 5px;
+  border: 1px solid black;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0px 2px;
+  &.-primary {
+    background-color: #289c38 !important;
+    color: white;
+    i {
+      background-color: #289c38;
+    }
+    &:disabled {
+      background-color: #1c3826 !important;
+      i {
+        background-color: #1c3826;
+      }
+    }
+  }
+}
+.p-dialog-footer {
+  .button {
+    padding: 3px 8px;
+    margin: 0px 10px;
+  }
+}
+
+body {
+  &.theme-dark {
+    .button {
+      &.-primary {
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+@use "sass:math";
+
+.draw-grid-round {
+  display: grid;
+  width: 90%;
+  margin: 0px 100px;
+  position: absolute;
+  left: 0;
+  @for $i from 1 through 10 {
+    &.-rounds-#{$i} {
+      grid-template-columns: repeat($i, percentage(1 / $i));
+      /*.draw-round {
+        .draw-round-game {
+          .after-game-grid {
+            height: calc(($i - 10) / 2 * 55 * 2px) !important;
+          }
+        }
+      }*/
+      $games-count: math.ceil(math.pow(2.7, ($i - 1) * math.log(2)));
+      $height: 65px;
+      @for $j from 1 through $i {
+        .draw-round {
+          &.-round-#{$j - 1} {
+            .after-game-grid {
+              &.-grid-0 {
+                height: $height;
+              }
+            }
+          }
+        }
+        $height: $height * 2;
+      }
+    }
+  }
+  .draw-round {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    flex-direction: column;
+    align-content: space-between;
+    .draw-round-title {
+      font-weight: bold;
+      text-align: center;
+    }
+    .draw-round-game {
+      display: flex;
+      height: 60px;
+      justify-content: center;
+      flex-direction: column;
+      width: calc(100% - 35px);
+      border: 2px solid black;
+      border-radius: 8px;
+      margin: 4px 0px;
+      padding: 2px 7px;
+      position: relative;
+      .game-player {
+        height: 28px;
+        background: transparent;
+        .seed-player {
+          color: green;
+        }
+      }
+      .after-game-grid {
+        &.-grid-1 {
+          width: 10px;
+          height: 55px;
+          border-bottom: 2px solid black;
+          border-right: 2px solid black;
+          display: inline-block;
+          /* float: right; */
+          position: absolute;
+          right: -12px;
+          top: -50%;
+        }
+        &.-grid-0 {
+          width: 10px;
+          height: 55px;
+          border-top: 2px solid black;
+          border-right: 2px solid black;
+          display: inline-block;
+          /* float: right; */
+          position: absolute;
+          right: -12px;
+          top: 50%;
+        }
+      }
+      .before-game-grid {
+        position: absolute;
+        width: 25px;
+        border-bottom: 2px solid black;
+        left: -25px;
+      }
+    }
+  }
+}
+
+body {
+  &.theme-dark {
+    .draw-grid-round {
+      .draw-round {
+        .draw-round-game {
+          border-color: white;
+          .after-game-grid {
+            border-color: white;
+          }
+          .before-game-grid {
+            border-color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media print {
+  .draw-grid-round {
+    color: black !important;
+    .draw-round {
+      .draw-round-game {
+        border: 2px solid black !important;
+        .after-game-grid {
+          border-color: black !important;
+        }
+        .before-game-grid {
+          border-color: black !important;
+        }
+      }
+    }
+  }
+}
