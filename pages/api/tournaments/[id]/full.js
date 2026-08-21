@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         return {};
       }
       try {
-        const tournament = await Tournament.getFullTournamentInfo(req.query.id, userSession.user.id);
+        const tournament = await Tournament.getFullTournamentInfo(req.query.id, userSession.user.role === "admin" ? null : user.id);
 
         res.status(200).json({ success: true, data: tournament });
       } catch (error) {
