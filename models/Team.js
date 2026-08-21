@@ -1,3 +1,6 @@
+const path = require('path');
+const fse = require('fs-extra');
+
 import TeamSchema from "./schemas/TeamSchema";
 
 const getAllTeams = async function () {
@@ -8,8 +11,14 @@ const getTeamsByIds = async function (ids = []) {
   return await TeamSchema.find({ _id: { $in: ids } });
 }
 
-const create = async function (params) {
-  return await TeamSchema.create(params);
+const create = async function (params, imgData) {
+  const team = await TeamSchema.create(params);
+  if (imgData && imgData.filepath) {
+    const imgName = team._id + path.extname(imgData.filepath);
+    fse.moveSync(imgData.filepath, process.cwd() + '/public/images/' + imgName);
+    return await update(team._id, { image: imgName });
+  }
+  return team;
 }
 
 const getById = async function (id) {
@@ -19,6 +28,7 @@ const getById = async function (id) {
 }
 
 const update = async function (id, update) {
+  console.log(id, update);
   return await TeamSchema.updateOne({ _id: id }, update);
 }
 

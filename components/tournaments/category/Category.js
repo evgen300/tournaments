@@ -14,6 +14,8 @@ import AddPlayers from "@/components/tournaments/AddPlayers";
 import AddTeams from "@/components/tournaments/AddTeams";
 import CategoryDraw from "@/components/tournaments/category/CategoryDraw";
 import CategoryDrawRound from "@/components/tournaments/category/CategoryDrawRound";
+import GroupsBaskets from "@/components/tournaments/category/GroupsBaskets";
+import CategoryGroups from "@/components/tournaments/category/CategoryGroups";
 
 import LoaderMain from "@/components/LoaderMain";
 
@@ -76,6 +78,12 @@ export default function Category(props) {
       }
       if (currentCategory.ageTo) {
         filter.ageTo = currentCategory.ageTo;
+      }
+      if (currentCategory.weightFrom) {
+        filter.weightFrom = currentCategory.weightFrom;
+      }
+      if (currentCategory.weightTo) {
+        filter.weightTo = currentCategory.weightTo;
       }
       filter.tournament_id = currentTournament._id;
       return await filterPlayers(filter);
@@ -175,72 +183,88 @@ export default function Category(props) {
               </div>
             </div>
             <div>
+              { !drawProgress ? (
               <button className="button -primary" onClick={() => {
                 onDrawCategory();
               }}>{ t('draw') }</button>
+              ) : (
+                <span className="button">{ t('draw_progress') }</span>
+              ) }
             </div>
-            { playersByCategory[currentCategory.id].length > 0 ? (
-              <div className="items-list">
-                { currentCategory.type === "individual" ? (
-                  <div className={"items-header item-row" + (currentCategory.seeds ? " -rows-3" : " -rows-2")}>
-                    <div className="item-header">#</div>
-                    <div className="item-header">{ t("name") }</div>
-                    { currentCategory.seeds ? (
-                      <div className="item-header">{ t("seeds") }</div>
-                    ) : '' }
-                  </div>
-                ) : (
-                  <div className={"items-header item-row" + (currentCategory.seeds ? " -rows-3" : " -rows-2")}>
-                    <div className="item-header">{ t("title") }</div>
-                    <div className="item-header">{ t("hometown") }</div>
-                    { currentCategory.seeds ? (
-                      <div className="item-header">{ t("seeds") }</div>
-                    ) : '' }
-                  </div>
-                ) }
-                { updateSeedsProgress ? (
-                  <LoaderMain />
-                ) : (
-                  <div>
-                    { currentCategory.type === "individual" ? playersByCategory[currentCategory.id].map((playersInfo, playersInfoIdx) => {
-                      return (
-                        <div className="item-row-header" key={playersInfoIdx}>
-                          <div className="title">
-                            { playersInfo.team.title ? playersInfo.team.title : "No team" }
-                          </div>
-                          { playersInfo.players.map((player, playerIdx) => {
-                            return (
-                              <div className={"item-row " +  (currentCategory.seeds ? "-rows-4" : "-rows-3") } key={ playerIdx }>
-                                <div className="item-field">{ player.index }</div>
-                                <div className="item-field">{ player.last_name } { player.first_name } { player.second_name }</div>
-                                <div className="item-field">{ player.team && player.team._id ? `${player.team.title}, ${player.team.hometown}` : '' }</div>
-                                { currentCategory.seeds ? (
-                                  <div className="item-field">
-                                    <Checkbox name="categorySeeds" value={ player._id } onChange={onSetSeedPlayer} checked={ seedPlayers.includes(player._id) } />
-                                  </div>
-                                ) : ('') }
-                              </div>
-                            )
-                          }) }
-                        </div>
-                      )
-                    }) : playersByCategory[currentCategory.id][0].players.map((team, teamIdx) => {
-                      return (
-                        <div className="item-row -rows-2" key={ teamIdx }>
-                          <div className="item-field">{ team.title }</div>
-                          <div className="item-field">{ team.hometown }</div>
-                        </div>
-                      )
-                    }) }
-                    { currentCategory.seeds ? (
-                      <div className="items-list-actions -actions-1">
-                        <button className="button -primary" onClick={ updateCategorySeeds }>{ t('save') }</button>
+            { currentCategory.type === "group" && currentCategory.groups.length > 0 ? (
+              <CategoryGroups category={ currentCategory } />
+            ) : (
+              <>
+                { playersByCategory[currentCategory.id].length > 0 ? (
+                  <div className="items-list">
+                    { currentCategory.type === "individual" ? (
+                      <div className={"items-header item-row" + (currentCategory.seeds ? " -rows-3" : " -rows-2")}>
+                        <div className="item-header">#</div>
+                        <div className="item-header">{ t("name") }</div>
+                        { currentCategory.seeds ? (
+                          <div className="item-header">{ t("seeds") }</div>
+                        ) : '' }
                       </div>
-                    ) : ('') }
+                    ) : (
+                      <div className={"items-header item-row -teams-list" + (currentCategory.seeds ? " -rows-4" : " -rows-3")}>
+                        <div className="item-header"></div>
+                        <div className="item-header">{ t("title") }</div>
+                        <div className="item-header">{ t("hometown") }</div>
+                        { currentCategory.seeds ? (
+                          <div className="item-header">{ t("seeds") }</div>
+                        ) : '' }
+                      </div>
+                    ) }
+                    { updateSeedsProgress ? (
+                      <LoaderMain />
+                    ) : (
+                      <div>
+                        { currentCategory.type === "individual" ? playersByCategory[currentCategory.id].map((playersInfo, playersInfoIdx) => {
+                          return (
+                            <div className="item-row-header" key={playersInfoIdx}>
+                              <div className="title">
+                                { playersInfo.team.title ? playersInfo.team.title : "No team" }
+                              </div>
+                              { playersInfo.players.map((player, playerIdx) => {
+                                return (
+                                  <div className={"item-row " +  (currentCategory.seeds ? "-rows-4" : "-rows-3") } key={ playerIdx }>
+                                    <div className="item-field">{ player.index }</div>
+                                    <div className="item-field">{ player.last_name } { player.first_name } { player.second_name }</div>
+                                    <div className="item-field">{ player.team && player.team._id ? `${player.team.title}, ${player.team.hometown}` : '' }</div>
+                                    { currentCategory.seeds ? (
+                                      <div className="item-field">
+                                        <Checkbox name="categorySeeds" value={ player._id } onChange={onSetSeedPlayer} checked={ seedPlayers.includes(player._id) } />
+                                      </div>
+                                    ) : ('') }
+                                  </div>
+                                )
+                              }) }
+                            </div>
+                          )
+                        }) : playersByCategory[currentCategory.id][0].players.map((team, teamIdx) => {
+                          return (
+                            <div className="item-row -rows-3 -teams-list" key={ teamIdx }>
+                              <div className="item-field">
+                                { team.image ? (
+                                  <img src={ '/images/' + team.image } />
+                                ) : '' }
+                              </div>
+                              <div className="item-field">{ team.title }</div>
+                              <div className="item-field">{ team.hometown }</div>
+                            </div>
+                          )
+                        }) }
+                        { currentCategory.seeds ? (
+                          <div className="items-list-actions -actions-1">
+                            <button className="button -primary" onClick={ updateCategorySeeds }>{ t('save') }</button>
+                          </div>
+                        ) : ('') }
+                      </div>
+                    ) }
                   </div>
-                ) }
-              </div>
-            ) : '' }
+                ) : '' }
+              </>
+            ) }
             { drawProgress ? (
               <LoaderMain />
             ) : ( <div>
@@ -261,11 +285,16 @@ export default function Category(props) {
           </TabPanel>
           <TabPanel header={currentCategory.type === "individual" ? t("add_players") : t("add_teams")} key="tab-add-players">
             { currentCategory.type === "individual" ? (
-              <AddPlayers filterPlayers={ searchPlayers } predefinedFilters={ ['age', 'sex', 'age_from', 'age_to'] } onAddPlayers={ addPlayers } hideForm={ () => {} }></AddPlayers>
+              <AddPlayers filterPlayers={ searchPlayers } predefinedFilters={ ['age', 'sex', 'age_from', 'age_to', 'weight_from', 'weight_to'] } onAddPlayers={ addPlayers } hideForm={ () => {} }></AddPlayers>
             ) : (
               <AddTeams filterTeams={ searchTeams } onAddTeams={ addTeams } hideForm={ () => {} }></AddTeams>
             ) }
           </TabPanel>
+          { currentCategory.hasGroups && currentCategory.groupsData.groupsCount > 0 ? (
+            <TabPanel header={ t("baskets_edit") } key="tab-baskets">
+              <GroupsBaskets category={ currentCategory } />
+            </TabPanel>
+          ) : '' }
         </TabView>
       ) : (
         <LoaderMain></LoaderMain>

@@ -34,9 +34,9 @@ export function TeamsProvider({children}) {
     return await fetch(`/api/teams`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        //'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params)
+      body: params
     });
   }
 
@@ -44,9 +44,9 @@ export function TeamsProvider({children}) {
     return await fetch(`/api/teams/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
+        //'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params)
+      body: params
     });
   }
 
@@ -78,17 +78,19 @@ export function TeamsProvider({children}) {
   }
 
   const fetchSports = async function () {
-    const res = await fetch('/api/sports');
-    const data = await res.json();
-    let list = [];
-    data.data.forEach(sport => {
-      list.push({
-        _id: sport._id,
-        name: t(sport.name)
+    if (sports.length === 0) {
+      const res = await fetch('/api/sports');
+      const data = await res.json();
+      let list = [];
+      data.data.forEach(sport => {
+        list.push({
+          _id: sport._id,
+          name: t(sport.name)
+        });
       });
-    });
-    setSports(data.data);
-    setSportsList(list);
+      setSports(data.data);
+      setSportsList(list);
+    }
   }
 
   const fetchAllTeams = async function() {

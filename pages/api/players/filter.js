@@ -26,6 +26,14 @@ export default async function handler(req, res) {
             case 'ageTo':
               params.push({field: field, value: req.query[field], compare: '>='});
               break;
+            case 'weight_from':
+            case 'weightFrom':
+              params.push({field: field, value: req.query[field], compare: '>='});
+              break;
+            case 'weight_to':
+            case 'weightTo':
+              params.push({field: field, value: req.query[field], compare: '<='});
+              break;
             case "team_id":
               params.push({field: field, value: req.query[field].split(","), compare: 'in'});
               break;

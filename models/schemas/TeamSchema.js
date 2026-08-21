@@ -7,7 +7,8 @@ const TeamSchema = new mongoose.Schema({
   },
   hometown: String,
   user_id: String,
-  sports: Array
+  sports: Array,
+  image: String
 });
 
 export default mongoose.models.Team || mongoose.model('Team', TeamSchema);

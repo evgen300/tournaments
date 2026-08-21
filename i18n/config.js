@@ -59,6 +59,7 @@ i18n
           martial_arts: "Martial arts",
           athletics: "Athletics",
           tennis: "Tennis",
+          football: "Football",
           add_teams: "Add teams",
           add_players: "Add players",
           add_category: "Add category",
@@ -94,7 +95,12 @@ i18n
           login: "Login",
           register: "Register",
           theme: "Theme",
-          chief: "Chief Judge"
+          chief: "Chief Judge",
+          baskets_edit: "Draw pots",
+          group_label: "Group",
+          weight: "Weight",
+          weight_from: "Weight from",
+          weight_to: "Weight to"
         },
       },
       ua: {
@@ -138,6 +144,7 @@ i18n
           martial_arts: "Бойові мистецтва",
           athletics: "Атлетіка",
           tennis: "Теніс",
+          football: "Футбол",
           add_teams: "Додати команди",
           add_players: "Додати гравців",
           add_category: "Додати категорію",
@@ -173,7 +180,12 @@ i18n
           login: "Увійти",
           register: "Реєстрація",
           theme: "Тема",
-          chief: "Головний суддя"
+          chief: "Головний суддя",
+          baskets_edit: "Корзини для жеребу",
+          group_label: "Група",
+          weight: "Вага",
+          weight_from: "Вага від",
+          weight_to: "Вага до"
         },
       },
     },

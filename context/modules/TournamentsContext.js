@@ -77,6 +77,18 @@ export function TournamentsProvider({children}) {
     });
   }
 
+  const saveGameResult = async function(category_id, result, groupIdx) {
+    const response = await fetch(`/api/tournaments/${currentTournament._id}/game_result`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ category_id: category_id, result: result, groupIdx: groupIdx })
+    });
+    await fetchTournamentFull(currentTournament._id);
+    return response.data;
+  }
+
   const value = {
     tournaments,
     fetchTournaments,
@@ -89,7 +101,8 @@ export function TournamentsProvider({children}) {
     currentTournamentPlayers,
     playersByCategory,
     drawCategory,
-    currentTournamentPlayersByTeam
+    currentTournamentPlayersByTeam,
+    saveGameResult
   };
 
   return (

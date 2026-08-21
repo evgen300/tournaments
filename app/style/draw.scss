@@ -8,7 +8,7 @@
   left: 0;
   @for $i from 1 through 10 {
     &.-rounds-#{$i} {
-      grid-template-columns: repeat($i, percentage(1 / $i));
+      grid-template-columns: repeat($i, math.percentage(calc(1 / $i)));
       /*.draw-round {
         .draw-round-game {
           .after-game-grid {

@@ -45,10 +45,10 @@ const remove = async function (id) {
 }
 
 const filter = async function (filter = []) {
-  let check = PlayerSchema.aggregate({$project: {fullname: {$concat: ["$first_name", "$last_name"]}}}, {$match: {fullname: new RegExp("Віл", 'i')}});
+  /*let check = PlayerSchema.aggregate({$project: {fullname: {$concat: ["$first_name", "$last_name"]}}}, {$match: {fullname: new RegExp("Віл", 'i')}});
   console.log(check);
   check = await PlayerSchema.find({$expr:{$eq:[/Віл/, {$concat:["$first_name", "$last_name"]}]}});
-  console.log(check);
+  console.log(check);*/
   let params = {};
   for (const field of filter) {
     if (['ageFrom', 'age_from'].includes(field.field)) {
@@ -62,6 +62,14 @@ const filter = async function (filter = []) {
       dateTime.setYear(dateTime.getFullYear() - field.value);
       field.field = "birth";
       field.value = dateTime.toISOString();
+    }
+    if (['weightFrom', 'weight_from'].includes(field.field)) {
+      field.field = "weight";
+      field.value = parseInt(field.value);
+    }
+    if (['weightTo', 'weight_to'].includes(field.field)) {
+      field.field = "weight";
+      field.value = parseInt(field.value);
     }
     switch (field.field) {
       case "tournament_id":
@@ -139,6 +147,10 @@ const filter = async function (filter = []) {
   return await PlayerSchema.find(params);
 }
 
+const getPlayersByIds = async function (ids = []) {
+  return await PlayerSchema.find({ _id: { $in: ids } });
+}
+
 export default {
   getPlayers,
   getAllPlayers,
@@ -146,5 +158,6 @@ export default {
   update,
   create,
   remove,
-  filter
+  filter,
+  getPlayersByIds
 }

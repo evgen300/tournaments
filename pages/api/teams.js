@@ -3,6 +3,14 @@ import Team from '@/models/Team';
 
 import { getSession } from '@/lib/auth';
 
+import formidable from "formidable";
+
+export const config = {
+  api: {
+    bodyParser: false, // Disables automatic parsing, allowing Formidable to read the stream
+  },
+};
+
 export default async function handler(req, res) {
   await dbConnect();
 
@@ -35,10 +43,31 @@ export default async function handler(req, res) {
       break;
     case 'POST':
       try {
-        let teamData = req.body;
+        const form = formidable({
+          keepExtensions: true,
+          uploadDir: '/tmp/'
+        });
+        form.parse(req, async (err, fields, files) => {
+          let formData = {};
+          Object.keys(fields).forEach(field => {
+            if (fields[field].length > 0) {
+              if (['sports'].includes(field)) {
+                formData[field] = fields[field][0].split(',');
+              } else {
+                formData[field] = fields[field][0];
+              }
+            }
+          });
+          formData.user_id = userSession.user.id;
+          const team = await Team.create(formData, files.image && files.image[0] ? files.image[0] : {});
+          res.status(201).json({ success: true, data: team });
+          //console.log(err, fields);
+          //console.log(files);
+        });
+        /*console.log(teamData);
         teamData.user_id = userSession.user.id;
         const team = await Team.create(teamData);
-        res.status(201).json({ success: true, data: tournament });
+        res.status(201).json({ success: true, data: tournament });*/
       } catch (error) {
         console.log(error);
         res.status(400).json({ success: false });

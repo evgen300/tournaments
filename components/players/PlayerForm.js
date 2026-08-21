@@ -22,6 +22,7 @@ export default function PlayerForm(props) {
   const [ grade, setGrade ] = useState("");
   const [ sex, setSex ] = useState("");
   const [ secondName, setSecondName ] = useState("");
+  const [ weight, setWeight ] = useState(null);
   const [ teamList, setTeamList ] = useState([]);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export default function PlayerForm(props) {
     setBirth(playerData.birth || '');
     setGrade(playerData.grade || '');
     setSex(playerData.sex || '');
+    setWeight(playerData.weight || 0);
   }, [ playerData ]);
 
   useEffect(() => {
@@ -89,6 +91,12 @@ export default function PlayerForm(props) {
             <div className="field-title">{ t('grade') }</div>
             <div className="field-value">
               <input name="grade" type="text" defaultValue={grade} />
+            </div>
+          </div>
+          <div className="add-item-field">
+            <div className="field-title">{ t('weight') }</div>
+            <div className="field-value">
+              <input name="weight" type="number" defaultValue={weight} />
             </div>
           </div>
           <div className="add-item-field">

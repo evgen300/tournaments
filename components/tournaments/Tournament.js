@@ -197,20 +197,22 @@ export default function Tournament (params) {
                 <i className="fa-solid fa-plus"></i>&nbsp;{ t("add") }
               </button>
               <div className="items-header items-list">
-                <div className="item-row -rows-4">
+                <div className="item-row -rows-5">
                   <div className="item-header">{ t('title') }</div>
                   <div className="item-header">{ t('age') }</div>
+                  <div className="item-header">{ t('weight') }</div>
                   <div className="item-header">{ t('type') }</div>
                 </div>
                 { currentTournament.categories.map((category, categoryIdx) => {
                   return (
-                    <div key={categoryIdx} className="item-row -rows-4">
+                    <div key={categoryIdx} className="item-row -rows-5">
                       <div className="item-field">
                         <Link href={`/tournaments/${currentTournament._id}/category/${category.id}`}>
                           { category.title }
                         </Link>
                       </div>
                       <div className="item-field">{ category.ageFrom && category.ageTo ? `${category.ageFrom} - ${category.ageTo}` : (category.ageFrom ? `${category.ageFrom}+` : `-`) }</div>
+                      <div className="item-field">{ category.weightFrom && category.weightTo ? `${category.weightFrom} - ${category.weightTo}` : (category.weightFrom ? `${category.weightFrom}+` : `-`) }</div>
                       <div className="item-field">{ t(category.type) }</div>
                       <div className="item-action">
                         <i onClick={() => {

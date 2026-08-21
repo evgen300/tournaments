@@ -15,7 +15,8 @@ const PlayerSchema = new mongoose.Schema({
   sex: String,
   active: Boolean,
   second_name: String,
-  index: Number
+  index: Number,
+  weight: Number
 });
 
 export default mongoose.models.Player || mongoose.model('Player', PlayerSchema);

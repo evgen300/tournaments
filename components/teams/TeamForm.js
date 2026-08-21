@@ -16,6 +16,7 @@ export default function TeamForm(props) {
   const [ title, setTitle ] = useState("");
   const [ hometown, setHometown ] = useState("");
   const [ teamSports, setTeamSports ] = useState([]);
+  const [ image, setImage ] = useState("");
 
   useEffect(() => {
     setTitle(teamData.title || '');
@@ -40,7 +41,9 @@ export default function TeamForm(props) {
       setCreating(true);
       let formData = Object.fromEntries(data);
       formData.sports = teamSports;
-      await action(formData);
+      data.set('sports', teamSports);
+      formData.image = data.get('image');
+      await action(data);
     }
   }
   const [ state, formAction, pending ] = useActionState(handleSubmitForm, {});
@@ -53,6 +56,16 @@ export default function TeamForm(props) {
             <div className="field-title">{ t('title') }</div>
             <div className="field-value">
               <input name="title" type="text" defaultValue={title} />
+            </div>
+          </div>
+          <div className="add-item-field">
+            <div className="field-title">{ t('image') }</div>
+            <div className="field-value">
+              <input 
+                type="file" 
+                name="image" 
+                accept="image/*" 
+              />
             </div>
           </div>
           <div className="add-item-field">

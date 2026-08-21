@@ -2,6 +2,10 @@ import TournamentSchema from "@/models/schemas/TournamentSchema";
 import Team from "@/models/Team";
 import Player from "@/models/Player";
 import Category from "@/models/Category";
+import CategoryGroup from "@/models/CategoryGroup";
+import Sports from "@/models/Sports";
+
+import lodash from 'lodash';
 
 const PRYVYD_ID = "pryvyd";
 
@@ -58,7 +62,11 @@ const getFullTournamentInfo = async function (id, user_id) {
       teamIds.push(player.team_id);
     }
   });
-  tournament.categories.forEach(category => {
+  
+  tournament.categories = tournament.categories || [];
+
+  tournament.categories.forEach((category, idx) => {
+    tournament.categories[idx] = new Category(category);
     if (category.type === "group") {
       category.players.forEach(team_id => {
         if (!teamIds.includes(team_id)) {
@@ -69,8 +77,6 @@ const getFullTournamentInfo = async function (id, user_id) {
   });
   const teams = await Team.getTeamsByIds(teamIds);
   let playersByCategory = {};
-  
-  tournament.categories = tournament.categories || [];
   /*for(const category of tournament.categories) {
     playersByCategory[category.id] = category.type === "individual" ? await Player.getPlayers(category.players || []) : await Team.getTeamsByIds(category.players || []);
   }*/
@@ -202,6 +208,9 @@ const draw = async function (tournament_id, category_id) {
   });
   const category = tournament.tournament.categories[categoryIdx];
   if (category) {
+    if (category.hasGroups) {
+      return drawGroups(tournament_id, category_id);
+    }
     let participants = category.players;
     if (Array.isArray(participants) && participants.length > 0) {
       participants = participants.slice();
@@ -340,8 +349,113 @@ const draw = async function (tournament_id, category_id) {
   return await getFullTournamentInfo(tournament_id);
 }
 
+const drawGroups = async function (tournament_id, category_id) {
+  const tournament = await getFullTournamentInfo(tournament_id);
+  let categoryIdx = tournament.tournament.categories.findIndex(cat => {
+    return cat.id === category_id;
+  });
+  const category = tournament.tournament.categories[categoryIdx];
+  if (category && category.groupsData.groupsCount > 0 && category.drawBaskets.length > 0) {
+    const participantsList = category.type === "group" ? await Team.getTeamsByIds(category.players) : await Player.getPlayersByIds(category.players);
+    let drawBaskets = lodash.cloneDeep(category.drawBaskets);
+    category.groups = [];
+    for (let i = 0; i < category.groupsData.groupsCount; ++i) {
+      let group = new CategoryGroup({index: i});
+      let basketIdx = 0;
+      while (group.players.length < category.groupsData.groupSize) {
+        if (drawBaskets[basketIdx]) {
+          if (drawBaskets[basketIdx].length > 0) {
+            const playerIndex = getRandomInt(0, drawBaskets[basketIdx].length - 1);
+            const playerId = drawBaskets[basketIdx].splice(playerIndex, 1)[0];
+            const player = participantsList.find(pl => {
+              return pl._id.toString() === playerId;
+            })
+            group.players.push(player);
+          }
+          ++basketIdx;
+        } else {
+          basketIdx = 0;
+        }
+        let hasPlayers = drawBaskets.find(basket => {
+          return basket.length > 0;
+        });
+        if (!hasPlayers) {
+          break;
+        }
+      }
+      category.groups.push(group);
+    }
+    tournament.tournament.categories[categoryIdx] = category;
+    await update(tournament_id, tournament.tournament);
+  }
+  return await getFullTournamentInfo(tournament_id);
+}
+
+const saveGameResult = async function (tournament_id, category_id, result, groupIdx = null) {
+  const sports = await Sports.getAll();
+  const tournament = await getById(tournament_id);
+  const categoryIdx = tournament.categories.findIndex(cat => {
+    return cat.id === category_id;
+  });
+
+  if (categoryIdx !== -1) {
+    let category = tournament.categories[categoryIdx];
+    const sport = sports.find(sp => {
+      return sp._id.toString() === category.sport;
+    });
+    
+    if (sport) {
+      switch (sport.name) {
+        case "football":
+          if (groupIdx !== null) {
+            let group = category.groups[groupIdx];
+            let resultIdx = group.results.findIndex(res => {
+              return res.playerA === result.playerA && res.playerB === result.playerB;
+            });
+            if (resultIdx !== -1) {
+              group.results[resultIdx] = result;
+            } else {
+              group.results.push(result);
+            }
+            [result.playerA, result.playerB].forEach(player_id => {
+              let scored = 0;
+              let missed = 0;
+              let points = 0;
+              group.results.forEach(res => {
+                if (res.playerA === player_id) {
+                  scored+= res.resultA;
+                  missed+= res.resultB;
+                  points+= (res.resultA > res.resultB ? 3 : (res.resultA === res.resultB ? 1 : 0));
+                } else if (res.playerB === player_id) {
+                  scored+= res.resultB;
+                  missed+= res.resultA;
+                  points+= (res.resultA < res.resultB ? 3 : (res.resultA === res.resultB ? 1 : 0));
+                }
+              });
+              group.positions[player_id] = {
+                points: points,
+                scored: scored,
+                missed: missed,
+                diff: scored - missed
+              };
+            });
+            category.groups[groupIdx] = new CategoryGroup(group);
+            tournament.categories[categoryIdx] = new Category(category);
+            console.log(await update(tournament_id, { $set: { categories: tournament.categories } }));
+          }
+          break;
+      }
+    }
+  }
+  return await getFullTournamentInfo(tournament_id);
+}
+
 const getRandom = function (min, max) {
   return Math.random() * (max - min) + min;
+}
+
+const getRandomInt = function (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const getRoundsCount = function (games) {
@@ -356,5 +470,6 @@ export default {
   getFullTournamentInfo,
   draw,
   getUserTournament,
-  getUserTournaments
+  getUserTournaments,
+  saveGameResult
 }

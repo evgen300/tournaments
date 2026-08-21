@@ -19,6 +19,8 @@ export default function addPlayers(props) {
   const [ teamFilter, setTeamFilter ] = useState([]);
   const [ ageFromFilter, setAgeFromFilter ] = useState("");
   const [ ageToFilter, setAgeToFilter ] = useState("");
+  const [ weightFromFilter, setWeightFromFilter ] = useState("");
+  const [ weightToFilter, setWeightToFilter ] = useState("");
   const [ selectedPlayers, setSelectedPlayers ] = useState([]);
   const [ filteredPlayers, setFilteredPlayers ] = useState([]);
   const [ teamsById, setTeamsById ] = useState({});
@@ -55,6 +57,12 @@ export default function addPlayers(props) {
     }
     if (ageToFilter) {
       filter.age_to = ageToFilter;
+    }
+    if (weightFromFilter) {
+      filter.weight_from = weightFromFilter;
+    }
+    if (weightToFilter) {
+      filter.weight_to = weightToFilter;
     }
     if (teamFilter.length > 0) {
       filter.team_id = teamFilter.join(",");
@@ -136,6 +144,20 @@ export default function addPlayers(props) {
           <div className="filter-head">
             <input type="number" value={ageToFilter} placeholder={ t("age_to") } onChange={(e) => {
               setAgeToFilter(e.target.value);
+            }} />
+          </div>
+        ) }
+        { Array.isArray(predefinedFilters) && predefinedFilters.includes("weight_from") ? '' : (
+          <div className="filter-head">
+            <input type="number" value={weightFromFilter} placeholder={ t("weight_from") } onChange={(e) => {
+              setWeightFromFilter(e.target.value);
+            }} />
+          </div>
+        ) }
+        { Array.isArray(predefinedFilters) && predefinedFilters.includes('weight_to') ? '' : (
+          <div className="filter-head">
+            <input type="number" value={weightToFilter} placeholder={ t("weight_to") } onChange={(e) => {
+              setWeightToFilter(e.target.value);
             }} />
           </div>
         ) }

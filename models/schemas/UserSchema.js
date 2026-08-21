@@ -19,6 +19,8 @@ const UserSchema = new mongoose.Schema({
   lang: {
     type: String
   }
+}, {
+  bufferCommands: false
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

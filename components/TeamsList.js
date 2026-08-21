@@ -41,14 +41,19 @@ export default function TeamsList() {
       <Link className="button -primary" href={"/teams/new"}>
         <i className="fa-solid fa-plus"></i>&nbsp;{ t('add') }
       </Link>
-      <div className="items-list">
-        <div className="items-header item-row -rows-3">
+      <div className="items-list -teams-list">
+        <div className="items-header item-row -rows-4">
           <div className="item-header">{ t('title') }</div>
           <div className="item-header">{ t('hometown') }</div>
         </div>
         { teams.map((team, teamIdx) => {
           return (
-            <div key={teamIdx} className="item-row -rows-3">
+            <div key={teamIdx} className="item-row -rows-4">
+              <div className="item-field">
+                { team.image ? (
+                  <img src={ '/images/' + team.image } />
+                ) : '' }
+              </div>
               <div className="item-field">{ team.title }</div>
               <div className="item-field">{ team.hometown }</div>
               <div className="item-action">
